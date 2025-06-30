@@ -1,1 +1,41 @@
-*.csv
+############################################################
+# 1) Datos pesados
+############################################################
+# CSV y otros archivos grandes de datos
+data/*.csv
+# EXCEPCIÓN: conserva el scaler porque es pequeño
+!data/scaler.json
+
+############################################################
+# 2) Binarios y cachés de Go
+############################################################
+/bin/
+/pkg/
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+############################################################
+# 3) Dependencias vendorizadas (si no usas `go mod vendor`)
+vendor/
+
+############################################################
+# 4) Archivos temporales de Docker / BuildKit
+############################################################
+**/docker/**/*~
+*.log
+
+############################################################
+# 5) Archivos de editor/IDE
+############################################################
+# VS Code
+.vscode/
+# JetBrains
+.idea/
+# Vim / Neovim
+*.swp
+# macOS / Windows
+.DS_Store
+Thumbs.db
