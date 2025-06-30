@@ -1,109 +1,108 @@
+# 🌲 Clustering Concurrente en Go – Registro Nacional de Plantaciones Forestales por Especies
 
-# 🌲 Clustering Concurrente en Go - Registro Nacional de Plantaciones Forestales por Especies
-
-Este proyecto tiene como objetivo aplicar técnicas de **Machine Learning (Clustering)** sobre el dataset del [Registro Nacional de Plantaciones Forestales por Especies](https://www.datosabiertos.gob.pe/dataset/registro-nacional-de-plantaciones-forestales-por-especies), utilizando el lenguaje de programación **Go** y aprovechando la **concurrencia** para optimizar el procesamiento de datos.
-
----
-
-## 📂 Dataset
-
-El dataset contiene información detallada sobre las plantaciones forestales registradas en el Perú, incluyendo:
-
-- Número de certificado
-- Titular y tipo de documento
-- Régimen de tenencia
-- Superficie (en hectáreas)
-- Especie registrada
-- Año del certificado
-- Autoridad regional (ARFFS)
-- Finalidad de la plantación
-- Fecha de corte (publicación)
-
-📥 Fuente: [datosabiertos.gob.pe](https://www.datosabiertos.gob.pe/dataset/registro-nacional-de-plantaciones-forestales-por-especies)
+Proyecto que entrena un **DBSCAN concurrente en Go** sobre el Registro Nacional de Plantaciones Forestales (RNFP) y expone una **API HTTP** para predecir el cluster de nuevos registros.  
+El modelo y el *scaler* se almacenan temporalmente en **Redis**; todo se despliega con **Docker Compose**.
 
 ---
 
-## 🧠 Objetivo del Proyecto
+## 📁 Dataset y artefactos
 
-- **Preprocesamiento** del dataset: limpieza, normalización y codificación de variables.
-- **Aplicación de algoritmos de clustering** como K-Means o DBSCAN para encontrar patrones y grupos en los datos.
-- **Implementación concurrente en Go**: utilización de goroutines y canales para acelerar el procesamiento.
-- **Exportación de resultados** para análisis y visualización.
+| Archivo                           | Tamaño | Dónde obtenerlo | Para qué se usa |
+|----------------------------------|--------|-----------------|-----------------|
+| `data/raw/Plantaciones_TOTAL.csv`| 1 GB   | Portal de Datos Abiertos | Fuente original (solo referencia) |
+| `data/matrix.csv`                | 282 MB | **Google Drive** – [carpeta pública](https://drive.google.com/drive/folders/1WCHD_TGvFteB7-ALYDt-OmAZXBS9lJsW?usp=sharing) | Matriz preprocesada (11 features) – insumo del *trainer* |
+| `data/scaler.json`               | 200 B  | Misma carpeta   | Media / σ de las columnas numéricas |
 
----
-
-## 🛠️ Estructura del Proyecto
-
-```
-/
-├── data/                        # Dataset original
-│   └── plantaciones.csv
-├── cmd/
-│   └── main.go                  # Punto de entrada principal
-├── pkg/
-│   ├── preproc/                 # Funciones de limpieza y transformación
-│   ├── model/                   # Algoritmos de clustering
-│   └── io/                      # Lectura y escritura de archivos
-├── results/
-│   └── clusters.json            # Resultados del clustering
-├── go.mod
-├── go.sum
-└── README.md
-```
+> Solo necesitas `matrix.csv` y `scaler.json` para reproducir el flujo completo; el CSV bruto se excluye del repo por tamaño.
 
 ---
 
-## 🚀 Ejecución
+## 🧠 Flujo del proyecto
 
-1. **Clona el repositorio:**
-```bash
-git clone https://github.com/marck0820001/Trabajo_Concurrente.git
-cd Trabajo_Concurrente
+1. **Trainer** – carga `matrix.csv`, aplica scaler, ejecuta DBSCAN concurrente y guarda modelo en Redis.  
+2. **Predictor** – lee modelo y scaler, expone `POST /predict` → `{ "cluster": N }`.  
+3. **Redis** – almacén temporal para modelo.
+
+---
+
+## 🛠️ Estructura principal
+
 ```
-
-2. **Descarga el dataset** desde el portal oficial y guárdalo como `data/plantaciones.csv`.
-
-3. **Ejecuta el modelo:**
-```bash
-go run cmd/main.go --input data/plantaciones.csv --clusters 5 --output results/clusters.json
+.
+├─ cmd/
+│  ├─ trainer/
+│  └─ predictor/
+├─ internal/
+├─ data/            ← matrix.csv, scaler.json
+├─ docker-compose.yaml
+└─ go.mod
 ```
-
-> Puedes configurar el número de clusters, tipo de algoritmo y parámetros de concurrencia.
 
 ---
 
 ## 🔧 Requisitos
 
-- Go 1.20 o superior
-- Paquetes estándar de Go (`encoding/csv`, `sync`, etc.)
-- Opcional: bibliotecas externas para clustering (`gonum`, etc.)
+* Docker Desktop + Docker Compose v2  
+* Go ≥ 1.22 (solo si compilas afuera)  
 
 ---
 
-## 📈 Resultados Esperados
+## 🚀 Paso a paso
 
-- Agrupación de registros por especies, regiones, superficie, etc.
-- Mejora del rendimiento al procesar grandes volúmenes de datos mediante concurrencia.
-- Exportación de los clusters para visualización en Python o herramientas GIS.
+```bash
+# 1) clona
+git clone https://github.com/marck0820001/Trabajo_Concurrente.git
+cd Trabajo_Concurrente
+
+# 2) descarga artefactos (matrix.csv, scaler.json)
+#    desde la carpeta de Google Drive:
+#    https://drive.google.com/drive/folders/1WCHD_TGvFteB7-ALYDt-OmAZXBS9lJsW?usp=sharing
+mkdir -p data
+# Copia los archivos descargados a ./data
+
+# 3) construye imágenes
+docker compose build
+
+# 4) levanta pila
+docker compose up -d
+
+# 5) prueba
+curl -X POST http://localhost:8080/predict      -H "Content-Type: application/json"      -d '{"features":[2018,0,160,313,26,0,2,5,0,395,0.61]}'
+
+# 6) escalar predictor
+docker compose up -d --scale predictor=3
+
+# 7) detener
+docker compose down --volumes
+```
 
 ---
 
-## 📌 TODO
+## ⚙️ Comandos útiles
 
-- [ ] Optimizar rendimiento en datasets grandes
-- [ ] Añadir visualización de clusters
-- [ ] Automatizar tests y validaciones
-- [ ] Documentar funciones y API
-
----
-
-## 📝 Licencia
-
-Este proyecto es de código abierto bajo la licencia MIT.
+```bash
+docker compose ps
+docker compose logs trainer
+docker compose logs predictor -f
+docker compose exec redis redis-cli KEYS ml:dbscan:*
+```
 
 ---
 
-## 🙌 Agradecimientos
+## .gitignore clave
 
-- [Datos Abiertos Perú](https://www.datosabiertos.gob.pe/)
-- Comunidad de Go y proyectos open source de ML en Go
+```
+data/*.csv
+data/raw/
+data/processed/
+!data/scaler.json
+/bin/
+/pkg/
+.vscode/
+.idea/
+.DS_Store
+```
+
+---
+
+MIT © 2025 Marco FRO.
