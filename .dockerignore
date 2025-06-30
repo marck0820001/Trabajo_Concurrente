@@ -1,0 +1,5 @@
+# --- EJEMPLO .dockerignore mínimo ---
+.git
+cmd/**/Dockerfile
+data/raw/              # deja fuera el CSV de 1 GB
+data/processed/

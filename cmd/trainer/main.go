@@ -5,13 +5,13 @@ import (
 	"encoding/json"
 	"log"
 
+	"github.com/marck0820001/Trabajo_Concurrente/internal/loader"
+	"github.com/marck0820001/Trabajo_Concurrente/internal/ml"
 	"github.com/redis/go-redis/v9"
-	"../../internal/loader"
-	"../../internal/ml"
 )
 
 const (
-	matrixPath   = "matrix.csv"
+	matrixPath   = "data/matrix.csv"
 	redisLabels  = "ml:dbscan:labels"
 	redisCentros = "ml:dbscan:centroids"
 )

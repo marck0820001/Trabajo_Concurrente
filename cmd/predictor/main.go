@@ -1,20 +1,20 @@
 package main
 
 import (
-	"context"
-	"encoding/json"
-	"log"
-	"math"
-	"net/http"
+    "context"
+    "encoding/json"
+    "log"
+    "math"
+    "net/http"
 
-	"github.com/redis/go-redis/v9"
-	"github.com/tuusuario/plantaciones/internal/data"
-	"github.com/tuusuario/plantaciones/internal/ml"
+    "github.com/redis/go-redis/v9"
+    "github.com/marck0820001/Trabajo_Concurrente/internal/data"   // ✅
 )
+
 
 const (
 	redisCentros = "ml:dbscan:centroids"
-	scalerPath   = "scaler.json"
+	scalerPath = "data/scaler.json"   // en lugar de "scaler.json"
 )
 
 var (
