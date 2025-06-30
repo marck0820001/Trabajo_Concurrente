@@ -1,0 +1,18 @@
+version: "3.9"
+services:
+  redis:
+    image: redis:7
+    ports: ["6379:6379"]
+
+  trainer:
+    build:
+      context: .
+      target: trainer
+    depends_on: [redis]
+
+  predictor:
+    build:
+      context: .
+      target: predictor
+    depends_on: [redis]
+    ports: ["8080:8080"]
