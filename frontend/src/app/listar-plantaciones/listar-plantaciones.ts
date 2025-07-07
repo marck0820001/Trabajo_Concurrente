@@ -1,32 +1,44 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
+import { HttpClientModule } from '@angular/common/http';
+import { PlantacionService, Plantacion } from '../services/plantacion/plantacion';
+import { MaterialModule } from '../material.module';
+import { PageEvent } from '@angular/material/paginator';
+import { RouterModule } from '@angular/router';
 
 @Component({
   selector: 'app-listar-plantaciones',
   standalone: true,
-  imports: [CommonModule, HttpClientModule],
-  template: `
-    <h2>Listado de Plantaciones</h2>
-    <ul *ngIf="plantaciones.length > 0; else sinDatos">
-      <li *ngFor="let p of plantaciones">
-        {{ p.departamento }} - {{ p.finalidad }} - {{ p.especie }} - {{ p.superficie }}ha - {{ p.regimen_tenencia }}
-      </li>
-    </ul>
-    <ng-template #sinDatos>
-      <p>No hay plantaciones registradas.</p>
-    </ng-template>
-  `
+  imports: [CommonModule, HttpClientModule, MaterialModule, RouterModule],
+  templateUrl: './listar-plantaciones.html'
 })
 export class ListarPlantacionesComponent implements OnInit {
-  plantaciones: any[] = [];
+  plantaciones: Plantacion[] = [];
+  paginadas: Plantacion[] = [];
+  pageSize = 4;
+  currentPage = 0;
 
-  constructor(private http: HttpClient) {}
+  constructor(private plantacionService: PlantacionService) {}
 
   ngOnInit() {
-    this.http.get<any[]>('http://localhost:8080/plantaciones').subscribe({
-      next: (data) => this.plantaciones = data,
+    this.plantacionService.listar().subscribe({
+      next: (data) => {
+        this.plantaciones = data;
+        this.actualizarPaginadas();
+      },
       error: () => alert('Error al listar plantaciones')
     });
+  }
+
+  onPageChange(event: PageEvent) {
+    this.pageSize = event.pageSize;
+    this.currentPage = event.pageIndex;
+    this.actualizarPaginadas();
+  }
+
+  actualizarPaginadas() {
+    const startIndex = this.currentPage * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    this.paginadas = this.plantaciones.slice(startIndex, endIndex);
   }
 }

@@ -1,1 +1,31 @@
-<p>listar-plantaciones works!</p>
+<div style="padding: 40px; background-color: #f5fff9; min-height: 100vh;">
+    <h2 style="text-align: center; color: #2e7d32; margin-bottom: 30px;">🌱 Plantaciones Registradas</h2>
+
+    <div *ngIf="plantaciones.length > 0; else sinDatos"
+        style="display: flex; flex-direction: column; gap: 16px; max-width: 800px; margin: 0 auto;">
+
+        <mat-card *ngFor="let p of paginadas"
+            style="padding: 16px; border-left: 6px solid #66bb6a; box-shadow: 0 2px 8px rgba(0,0,0,0.05)">
+            <h3 style="margin: 0 0 8px 0; color: #1b5e20;">🌾 {{ p.especie }} - {{ p.finalidad }}</h3>
+            <p style="margin: 4px 0;"><strong>Departamento:</strong> {{ p.departamento }}</p>
+            <p style="margin: 4px 0;"><strong>Superficie:</strong> {{ p.superficie }} ha</p>
+            <p style="margin: 4px 0;"><strong>Régimen de Tenencia:</strong> {{ p.regimen_tenencia }}</p>
+        </mat-card>
+
+        <!-- PAGINADOR -->
+        <mat-paginator *ngIf="plantaciones.length > pageSize" [length]="plantaciones.length" [pageSize]="pageSize"
+            [pageSizeOptions]="[4]" (page)="onPageChange($event)">
+        </mat-paginator>
+
+        <!-- BOTÓN DE VOLVER -->
+        <div style="text-align: center; margin-top: 20px;">
+            <button mat-raised-button color="accent" [routerLink]="['/dashboard']">
+                ⬅️ Volver al Dashboard
+            </button>
+        </div>
+    </div>
+
+    <ng-template #sinDatos>
+        <p style="text-align: center; color: #888;">No hay plantaciones registradas aún.</p>
+    </ng-template>
+</div>

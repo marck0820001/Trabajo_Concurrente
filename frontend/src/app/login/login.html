@@ -1,1 +1,28 @@
-<p>login works!</p>
+<div style="display: flex; justify-content: center; align-items: center; height: 100vh; background: #f1f8f4">
+    <mat-card style="width: 400px; padding: 30px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2)">
+        <h2 style="text-align: center; color: #2e7d32; margin-bottom: 20px;">
+            🌿 TecnoAgro Login
+        </h2>
+
+        <form (ngSubmit)="login()" style="display: flex; flex-direction: column; gap: 20px;">
+            <mat-form-field appearance="outline">
+                <mat-label>Email</mat-label>
+                <input matInput type="email" [(ngModel)]="email" name="email" required>
+                <mat-icon matSuffix>person</mat-icon>
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+                <mat-label>Contraseña</mat-label>
+                <input matInput type="password" [(ngModel)]="password" name="password" required>
+                <mat-icon matSuffix>lock</mat-icon>
+            </mat-form-field>
+
+            <button mat-raised-button color="primary" type="submit" style="width: 100%">Ingresar</button>
+        </form>
+
+        <p style="margin-top: 20px; text-align: center;">
+            ¿No tienes cuenta?
+            <a (click)="goToSignup()" style="cursor: pointer; color: #2e7d32; font-weight: bold;">Regístrate aquí</a>
+        </p>
+    </mat-card>
+</div>

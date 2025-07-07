@@ -1,45 +1,55 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { HttpClient, HttpClientModule } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { AuthService } from '../services/auth/auth';
+import { MaterialModule } from '../material.module';
+import { HttpClientModule } from '@angular/common/http';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-signup',
   standalone: true,
-  imports: [CommonModule, FormsModule, HttpClientModule],
-  template: `
-    <h2>Registro de Usuario</h2>
-    <form (ngSubmit)="signup()">
-      <input [(ngModel)]="email" name="email" type="email" placeholder="Email" required>
-      <input [(ngModel)]="password" name="password" type="password" placeholder="Contraseña" required>
-      <button type="submit">Registrarse</button>
-    </form>
-    <p>
-      ¿Ya tienes cuenta? <a (click)="goToLogin()" style="cursor:pointer; color:blue">Iniciar sesión</a>
-    </p>
-  `
+  imports: [CommonModule, FormsModule, HttpClientModule, MaterialModule],
+  templateUrl: './signup.html',
+  styleUrls: ['./signup.css']
 })
 export class SignupComponent {
   email = '';
   password = '';
 
-  constructor(private http: HttpClient, private router: Router) {}
+  constructor(
+    private auth: AuthService,
+    private router: Router,
+    private snackBar: MatSnackBar
+  ) {}
 
   signup() {
-    this.http.post('http://localhost:8080/signup', {
-      email: this.email,
-      password: this.password
-    }, { responseType: 'text' }).subscribe({
+    this.auth.signup(this.email, this.password).subscribe({
       next: () => {
-        alert('Registro exitoso');
+        this.snackBar.open('✅ Registro exitoso', 'Cerrar', {
+          duration: 3000,
+          verticalPosition: 'bottom',
+          horizontalPosition: 'start',
+          panelClass: ['success-snackbar']
+        });
         this.router.navigate(['/']);
       },
       error: (err) => {
         if (err.status === 409) {
-          alert('El usuario ya existe');
+          this.snackBar.open('⚠️ El usuario ya existe', 'Cerrar', {
+            duration: 3000,
+            verticalPosition: 'bottom',
+            horizontalPosition: 'start',
+            panelClass: ['error-snackbar']
+          });
         } else {
-          alert('Error al registrar');
+          this.snackBar.open('❌ Error al registrar', 'Cerrar', {
+            duration: 3000,
+            verticalPosition: 'bottom',
+            horizontalPosition: 'start',
+            panelClass: ['error-snackbar']
+          });
         }
       }
     });

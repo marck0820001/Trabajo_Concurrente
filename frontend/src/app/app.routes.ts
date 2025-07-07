@@ -7,8 +7,9 @@ import { SignupComponent } from './signup/signup';
 
 export const routes: Routes = [
     { path: '', component: LoginComponent },
+    { path: 'login', component: LoginComponent },
     { path: 'dashboard', component: DashboardComponent },
-    { path: 'registrar', component: RegistrarPlantacionComponent },
-    { path: 'signup', component: SignupComponent },
-    { path: 'listar', component: ListarPlantacionesComponent },
+    { path: 'registrar-plantacion', component: RegistrarPlantacionComponent },
+    { path: 'listar-plantaciones', component: ListarPlantacionesComponent },
+    { path: 'signup', component: SignupComponent }
 ];

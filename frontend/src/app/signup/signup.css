@@ -1,0 +1,17 @@
+.success-snackbar {
+    background-color: #43a047 !important;
+    /* verde */
+    color: white !important;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+
+.error-snackbar {
+    background-color: #e53935 !important;
+    /* rojo */
+    color: white !important;
+    font-weight: bold;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
